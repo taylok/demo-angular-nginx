@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: demo-app
+  name: demo-angular-nginx
+spec:
+  selector:
+    matchLabels:
+      app: demo-angular-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-angular-nginx
+    spec:
+      containers:
+        - name: demo-front-end
+          image: taylok/demo-angular-nginx:v0.1.0
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  paused: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-angular-nginx
+  namespace: demo-app
+spec:
+  selector:
+    app: demo-angular-nginx
+  ports:
+    - protocol: TCP
+      port: 8080
